@@ -33,7 +33,7 @@ while (true) do
   userName = gets.strip
   print "Please input your password: "
   password = STDIN.noecho(&:gets).strip
-  puts ">"*40
+  puts "\n>"*40
   
   register.add(cardId, userName, password)
 end
