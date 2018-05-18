@@ -1,4 +1,4 @@
-#!/home/khang/.rvm/rubies/ruby-2.4.1/bin/ruby
+#!/usr/bin/env ruby
 
 #require 'net/http'
 #require 'uri'
@@ -28,32 +28,18 @@ class Checker
   end
   
   def clockIn(credential)
-    puts "Clocking IN"
-    #serviceUrl =  URI.parse("https://pronet01.myprotime.be/ProNetEE.premnat01/Forms/login.aspx?AutoAuthenticate=0&&Customer=62")
-    #header = {
-    #  'Content-Type': 'text/html; charset=utf-8'
-    #}
-    #http = Net::HTTP.new(serviceUrl.host, serviceUrl.port)
-    #http.set_debug_output($stdout)
-    #request = Net::HTTP::Post.new(serviceUrl.request_uri, header)
-    #serviceConfig = JSON.parse(File.read('service.config.json'))
-    #request.body = serviceConfig.merge({
-    #  '__EVENTTARGET': 'LinkPunchIn',
-    #  'Username': credential["username"],
-    #  'Password': credential["password"]
-    #}).to_json
+    driver = Selenium::WebDriver.for :firefox
+    driver.navigate.to "https://pronet01.myprotime.be/pronetEE.premnat01/forms/login.aspx?Customer=62"
 
-    #response = http.request(request)
-    #puts response.inspect
+    element = driver.find_element(:id, 'Username')
+    element.send_keys credential.username
+    #element.submit
 
-    driver = Selenium::WebDriver.for :chrome
-    driver.navigate.to "http://google.com"
-
-    element = driver.find_element(:name, 'q')
-    element.send_keys "Selenium Tutorials"
-    element.submit
+    puts driver.title
 
     driver.quit
+
+    puts "Clocking IN"
   end
   
   def clockOut(credential)
