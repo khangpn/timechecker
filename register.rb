@@ -1,4 +1,4 @@
-#!/home/kng/.rvm/rubies/ruby-2.4.1/bin/ruby
+#!/usr/bin/env ruby
 
 require 'io/console'
 require './database.rb'

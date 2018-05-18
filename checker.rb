@@ -1,4 +1,4 @@
-#!/home/kng/.rvm/rubies/ruby-2.4.1/bin/ruby
+#!/home/khang/.rvm/rubies/ruby-2.4.1/bin/ruby
 
 #require 'net/http'
 #require 'uri'
