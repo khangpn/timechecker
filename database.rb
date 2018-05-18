@@ -32,4 +32,20 @@ class Database
       @db.execute("UPDATE credentials set state = ?", state)
     end
   end
+
+  def setStateIn(cardId)
+    credential = getByCardId(cardId)
+    unless credential.nil?
+      state = credential["state"]
+      @db.execute("UPDATE credentials set state = 1")
+    end
+  end
+
+  def setStateOut(cardId)
+    credential = getByCardId(cardId)
+    unless credential.nil?
+      state = credential["state"]
+      @db.execute("UPDATE credentials set state = 0")
+    end
+  end
 end
