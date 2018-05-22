@@ -23,13 +23,13 @@ class Checker
     unless (credential.nil?)
       if (credential["state"] == STATE_IN)
         puts "Clocking out..."
-        if clockOut(credential)
+        if clock_out(credential)
           @db.setStateOut(cardId)
           puts "Bye bye '#{credential['username']}'!"
         end
       else
         puts "Clocking in..."
-        if clockIn(credential)
+        if clock_in(credential)
           @db.setStateIn(cardId)
           puts "Hello '#{credential['username']}'! "
         end
@@ -39,7 +39,7 @@ class Checker
     end
   end
   
-  def clockIn(credential)
+  def clock_in(credential)
     begin
       input_general_data credential
       click_clock_in
@@ -52,7 +52,7 @@ class Checker
     end
   end
   
-  def clockOut(credential)
+  def clock_out(credential)
     begin
       input_general_data credential
       click_clock_out
@@ -63,6 +63,10 @@ class Checker
       puts ex
       return false
     end
+  end
+
+  def toggle_clock(credential)
+    clock_in credential
   end
 
   private
