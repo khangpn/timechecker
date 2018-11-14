@@ -43,7 +43,7 @@ class Checker
     begin
       input_general_data credential
       click_clock_in
-      #log_out
+      log_out
       return true
     rescue => ex
       puts "!!! Problem with webdrive !!! Cannot proceed!"
@@ -56,7 +56,7 @@ class Checker
     begin
       input_general_data credential
       click_clock_out
-      #log_out
+      log_out
       return true
     rescue => ex
       puts "!!! Problem with webdrive !!! Cannot proceed!"
@@ -92,6 +92,7 @@ class Checker
         btn = @driver.find_element(:id, "LogoutButton")
         btn.click
         @driver.switch_to.default_content
+        true #return true to skip the wait
       }
     end
 
@@ -117,6 +118,7 @@ class Checker
     end
 end
 
+system "clear" or system "cls"
 puts "="*40
 puts "|| Starting the time checking system ||"
 puts "="*40
@@ -124,11 +126,20 @@ puts "="*40
 mode = (ARGV[0].nil? || ARGV[0].empty? || ARGV[0].match(/^(development|production)$/).nil?) ? "development" : ARGV[0]
 checker = Checker.new(mode)
 
+def print_welcome
+  puts "="*40
+  puts "||                                     ||"
+  puts "|| WELCOME TO THE TIME CHECKING SYSTEM ||"
+  puts "||                                     ||"
+  puts "="*40
+end
+
 while (true) do
-  puts ("Please put your card on the reader: ")
-  #print ("Please put your card on the reader: ")
-  #cardId = gets.strip
+  system "clear" or system "cls"
+  print_welcome
+  puts ("Please put your card on the reader")
   cardId = STDIN.noecho(&:gets).strip
   checker.checkTime(cardId)
-  puts ">"*40
+  puts "### Exiting ###"
+  sleep 3
 end
