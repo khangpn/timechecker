@@ -21,28 +21,58 @@ class Checker
   def checkTime(cardId)
     credential = @db.getByCardId(cardId)
     unless (credential.nil?)
-      if (credential["state"] == STATE_IN)
+      count = @db.countLogs(cardId)[0]
+      out = (count%2 == 0) 
+      if out # We assume that the first time is clocking out
         puts "Clocking out..."
         if clock_out(credential)
-          @db.setStateOut(cardId)
+          @db.insertLog(cardId)
           puts "Bye bye '#{credential['username']}'!"
         end
       else
         puts "Clocking in..."
         if clock_in(credential)
-          @db.setStateIn(cardId)
+          @db.insertLog(cardId)
           puts "Hello '#{credential['username']}'! "
         end
       end
     else
       puts "Your card ID is not registered yet"
+      if wanna_register?
+        register_card
+      end
     end
+  end
+
+  def register_card()
+    print ("Please put your card on the reader: ")
+    cardId = gets.strip
+    print ("Please input your user name: ")
+    userName = gets.strip
+    print "Please input your password: "
+    password = STDIN.noecho(&:gets).strip
+    puts "\n>"*40
+    credential = @db.getByCardId(cardId)
+    if (credential.nil?)
+      @db.insert(cardId, userName, password)
+      puts "- Register new card successfully"
+    else
+      puts "- The card already exists"
+      puts "- Updating information"
+    end
+  end
+
+  def wanna_register?
+    print ("Do you want to register your card?(Y/N) ")
+    answer = gets.strip.upcase
+    answer == "Y"
   end
   
   def clock_in(credential)
     begin
       input_general_data credential
-      click_clock_in
+      #click_clock_in
+      log_in
       log_out
       return true
     rescue => ex
@@ -55,7 +85,8 @@ class Checker
   def clock_out(credential)
     begin
       input_general_data credential
-      click_clock_out
+      #click_clock_out
+      log_in
       log_out
       return true
     rescue => ex
