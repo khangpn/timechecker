@@ -16,7 +16,7 @@ class Database
   end
 
   def insert(cardId, userName, password)
-    @db.execute("INSERT INTO credentials(card_id, username, password)
+    @db.execute("REPLACE INTO credentials(card_id, username, password)
       VALUES(?, ?, ?)", cardId, userName, password)
   end
 

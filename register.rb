@@ -15,6 +15,7 @@ class Register
       puts "- Register new card successfully"
     else
       puts "- The card already exists"
+      puts "- Updating information"
     end
     puts ""
   end
@@ -26,7 +27,17 @@ puts "="*66
 
 register = Register.new()
 
+def print_welcome
+  puts "="*40
+  puts "||                                     ||"
+  puts "||  WELCOME TO THE REGISTERING SYSTEM  ||"
+  puts "||                                     ||"
+  puts "="*40
+end
+
 while (true) do
+  system "clear" or system "cls"
+  print_welcome
   print ("Please put your card on the reader: ")
   cardId = gets.strip
   print ("Please input your user name: ")
@@ -36,4 +47,7 @@ while (true) do
   puts "\n>"*40
   
   register.add(cardId, userName, password)
+
+  puts "### Exiting ###"
+  sleep 3
 end
