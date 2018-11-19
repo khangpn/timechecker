@@ -21,35 +21,20 @@ class Checker
   def checkTime(cardId)
     credential = @db.getByCardId(cardId)
     unless (credential.nil?)
-      count = @db.countLogs(cardId)[0]
+      lastLog = @db.getLastLog(cardId)
       # In fact, pronet handle clock in and out similarly, they count the number or records to
       #distingush in/out action
-      # TODO: remove in/out action and handle clocking generally
-      out = (count%2 == 0) 
       puts "Saving your time record..."
-      if out # We assume that the first time is clocking out
-        if clock_out(credential)
-          @db.insertLog(cardId)
-          puts "Bye bye '#{credential['username']}'!"
-          # Log out of pronet
-          begin
-            log_out
-            return true
-          rescue => ex
-            reset_driver
-          end
-        end
-      else
-        if clock_in(credential)
-          @db.insertLog(cardId)
-          puts "Hello '#{credential['username']}'! "
-          # Log out of pronet
-          begin
-            log_out
-            return true
-          rescue => ex
-            reset_driver
-          end
+      if clock_in(credential)
+        @db.insertLog(cardId)
+        puts "Hello '#{credential['username']}'! "
+        puts "Last clocking: #{lastLog['created_at']}"
+        # Log out of pronet
+        begin
+          log_out
+          return true
+        rescue => ex
+          reset_driver
         end
       end
     else
