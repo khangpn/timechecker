@@ -21,8 +21,9 @@ class Database
       )
     "
 
-    @db.execute "CREATE UNIQUE INDEX IF NOT EXISTS created_at_index ON logs(created_at);"
-    @db.execute "CREATE UNIQUE INDEX IF NOT EXISTS card_id_index ON credentials(card_id);"
+    # There are some problems on windows
+    #@db.execute "CREATE UNIQUE INDEX IF NOT EXISTS created_at_index ON logs(created_at);"
+    #@db.execute "CREATE UNIQUE INDEX IF NOT EXISTS card_id_index ON credentials(card_id);"
   end
 
   def insert(cardId, userName, password)
@@ -31,11 +32,13 @@ class Database
   end
 
   def getByCardId(cardId)
-    @db.get_first_row("SELECT * FROM credentials INDEXED BY card_id_index where card_id = ?", cardId)
+    #@db.get_first_row("SELECT * FROM credentials INDEXED BY card_id_index where card_id = ?", cardId)
+    @db.get_first_row("SELECT * FROM credentials where card_id = ?", cardId)
   end
 
   def getLastLog(cardId)
-    @db.get_first_row("SELECT * FROM logs INDEXED BY created_at_index where card_id = ? ORDER BY created_at DESC", cardId)
+    #@db.get_first_row("SELECT * FROM logs INDEXED BY created_at_index where card_id = ? ORDER BY created_at DESC", cardId)
+    @db.get_first_row("SELECT * FROM logs where card_id = ? ORDER BY created_at DESC", cardId)
   end
 
   def countLogs(cardId)
