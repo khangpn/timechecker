@@ -21,14 +21,12 @@ class Checker
   def checkTime(cardId)
     credential = @db.getByCardId(cardId)
     unless (credential.nil?)
-      lastLog = @db.getLastLog(cardId)
       # In fact, pronet handle clock in and out similarly, they count the number or records to
       #distingush in/out action
       puts "Saving your time record..."
       if clock_in(credential)
         @db.insertLog(cardId)
         puts "Hello '#{credential['username']}'! "
-        puts "Last clocking: #{lastLog['created_at']}"
         # Log out of pronet
         begin
           log_out
@@ -38,7 +36,9 @@ class Checker
         end
       end
     else
-      puts "Your card ID is not registered yet"
+      puts "- Your card ID is not registered yet"
+      puts ""
+      puts ">"*40
       if wanna_register?
         register_card
       end
@@ -46,13 +46,14 @@ class Checker
   end
 
   def register_card()
-    print ("Please put your card on the reader: ")
+    print ("- Please put your card on the reader: ")
     cardId = gets.strip
-    print ("Please input your user name: ")
+    print ("- Please input your PRONET user name: ")
     userName = gets.strip
-    print "Please input your password: "
+    print "- Please input your PRONET password: "
     password = STDIN.noecho(&:gets).strip
-    puts "\n>"*40
+    puts ""
+    puts ">"*40
     credential = @db.getByCardId(cardId)
     if (credential.nil?)
       @db.insert(cardId, userName, password)
@@ -72,8 +73,8 @@ class Checker
   def clock_in(credential)
     begin
       input_general_data credential
-      click_clock_in
-      #log_in
+      #click_clock_in
+      log_in
       return true
     rescue => ex
       puts "!!! Problem with webdrive !!! Cannot proceed!"
@@ -178,6 +179,6 @@ while (true) do
   puts ("Please put your card on the reader")
   cardId = STDIN.noecho(&:gets).strip
   checker.checkTime(cardId)
-  puts "### Exiting ###"
+  puts "##### Exiting #####"
   sleep 3
 end
