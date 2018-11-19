@@ -73,8 +73,8 @@ class Checker
   def clock_in(credential)
     begin
       input_general_data credential
-      #click_clock_in
-      log_in
+      click_clock_in
+      #log_in
       return true
     rescue => ex
       puts "!!! Problem with webdrive !!! Cannot proceed!"
