@@ -30,7 +30,6 @@ class Checker
         # Log out of pronet
         begin
           log_out
-          return true
         rescue => ex
           reset_driver
         end
@@ -77,7 +76,8 @@ class Checker
       #log_in
       return true
     rescue => ex
-      puts "!!! Problem with webdrive !!! Cannot proceed!"
+      puts "!!! Problem with connection !!! Failed to clock!"
+      puts "!!! Please try again !!!"
       puts ex
       reset_driver
       return false
@@ -91,7 +91,7 @@ class Checker
       #log_in
       return true
     rescue => ex
-      puts "!!! Problem with webdrive !!! Cannot proceed!"
+      puts "!!! Problem with connection !!! Failed to clock!"
       puts "!!! Please try again !!!"
       puts ex
       reset_driver
