@@ -122,7 +122,7 @@ class Checker
     end
 
     def log_out
-      wait = Selenium::WebDriver::Wait.new(:timeout => 10)
+      wait = Selenium::WebDriver::Wait.new(:timeout => 5)
       wait.until {
         @driver.switch_to.frame @driver.find_element(:name, 'main')
         btn = @driver.find_element(:id, "LogoutButton")
