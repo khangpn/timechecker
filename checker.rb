@@ -23,10 +23,11 @@ class Checker
     unless (credential.nil?)
       # In fact, pronet handle clock in and out similarly, they count the number or records to
       #distingush in/out action
-      puts "Saving your time record..."
+      puts "- Saving your time record..."
       if clock_in(credential)
         @db.insertLog(cardId)
         puts ""
+        puts ">"*40
         puts "Hello '#{credential['username']}'! "
         puts "Clocking successfully! Please wait the system to exit..."
         # Log out of pronet
@@ -38,8 +39,6 @@ class Checker
       end
     else
       puts "- Your card ID is not registered yet"
-      puts ""
-      puts ">"*40
       if wanna_register?
         register_card
       end
@@ -47,27 +46,51 @@ class Checker
   end
 
   def register_card()
+    puts ""
+    puts ">"*40
     print ("- Please put your card on the reader: ")
-    cardId = gets.strip
+    cardId = STDIN.noecho(&:gets).strip
+    puts ""
     print ("- Please input your PRONET user name: ")
-    userName = gets.strip
+    userName = STDIN.gets.strip
     print "- Please input your PRONET password: "
     password = STDIN.noecho(&:gets).strip
     puts ""
-    puts ">"*40
-    credential = @db.getByCardId(cardId)
-    if (credential.nil?)
-      @db.insert(cardId, userName, password)
-      puts "- Register new card successfully"
-    else
-      puts "- The card already exists"
-      puts "- Updating information"
+
+    credential = {}
+    credential['username'] = userName
+    credential['password'] = password
+    unless authenticated?(credential)
+      return register_card()
     end
+    @db.insert(cardId, userName, password)
+    puts "- Registering card successfully."
+    puts "- Please follow the instruction on screen."
+  end
+
+  def authenticated? credential
+    puts ""
+    puts ">"*40
+    puts "Checking authentication..."
+    log_in(credential)
+    if wrong_password?
+      puts "!!! The authentication is wrong !!!"
+      return false
+    end
+    puts "!!! The authentication is correct !!!"
+    begin
+      log_out
+    rescue => ex
+      reset_driver
+    end
+    true
   end
 
   def wanna_register?
-    print ("Do you want to register your card?(Y/N) ")
-    answer = gets.strip.upcase
+    puts ""
+    puts ">"*40
+    print ("Do you want to update your card?(Y/N) ")
+    answer = STDIN.gets.strip.upcase
     answer == "Y"
   end
   
@@ -75,8 +98,7 @@ class Checker
     begin
       input_general_data credential
       click_clock_in
-      #log_in
-      return true
+      #log_in(credential)
     rescue => ex
       puts "!!! Problem with connection !!! Failed to clock!"
       puts "!!! Please try again !!!"
@@ -84,14 +106,22 @@ class Checker
       reset_driver
       return false
     end
+
+    if wrong_password?
+      puts "!!! The authentication is wrong !!!"
+      if wanna_register?
+        register_card
+      end
+      return false
+    end
+    return true
   end
   
   def clock_out(credential)
     begin
       input_general_data credential
       click_clock_out
-      #log_in
-      return true
+      #log_in(credential)
     rescue => ex
       puts "!!! Problem with connection !!! Failed to clock!"
       puts "!!! Please try again !!!"
@@ -99,6 +129,15 @@ class Checker
       reset_driver
       return false
     end
+
+    if wrong_password?
+      puts "!!! The authentication is wrong !!!"
+      if wanna_register?
+        register_card
+      end
+      return false
+    end
+    return true
   end
 
   def toggle_clock(credential)
@@ -116,20 +155,17 @@ class Checker
       btn.click
     end
 
-    def log_in
+    def log_in(credential)
+      input_general_data credential
       btn = @driver.find_element(:id, 'ButtonLogin')
       btn.click
     end
 
     def log_out
-      wait = Selenium::WebDriver::Wait.new(:timeout => 5)
-      wait.until {
-        @driver.switch_to.frame @driver.find_element(:name, 'main')
-        btn = @driver.find_element(:id, "LogoutButton")
-        btn.click
-        @driver.switch_to.default_content
-        true #return true to skip the wait
-      }
+      @driver.switch_to.frame @driver.find_element(:name, 'main')
+      btn = @driver.find_element(:id, "LogoutButton")
+      btn.click
+      @driver.switch_to.default_content
     end
 
     def input_general_data credential
@@ -156,6 +192,16 @@ class Checker
     def reset_driver
       @driver.quit  
       @driver = initate_driver
+    end
+
+    def wrong_password?
+      begin
+        failedText = @driver.find_element(:id, "FailedLogin")
+        loginBtn = @driver.find_element(:id, 'ButtonLogin')
+        return true
+      rescue => ex
+        return false
+      end
     end
 end
 
