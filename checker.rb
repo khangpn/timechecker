@@ -22,18 +22,34 @@ class Checker
     credential = @db.getByCardId(cardId)
     unless (credential.nil?)
       count = @db.countLogs(cardId)[0]
+      # In fact, pronet handle clock in and out similarly, they count the number or records to
+      #distingush in/out action
+      # TODO: remove in/out action and handle clocking generally
       out = (count%2 == 0) 
+      puts "Saving your time record..."
       if out # We assume that the first time is clocking out
-        puts "Clocking out..."
         if clock_out(credential)
           @db.insertLog(cardId)
           puts "Bye bye '#{credential['username']}'!"
+          # Log out of pronet
+          begin
+            log_out
+            return true
+          rescue => ex
+            reset_driver
+          end
         end
       else
-        puts "Clocking in..."
         if clock_in(credential)
           @db.insertLog(cardId)
           puts "Hello '#{credential['username']}'! "
+          # Log out of pronet
+          begin
+            log_out
+            return true
+          rescue => ex
+            reset_driver
+          end
         end
       end
     else
@@ -71,13 +87,13 @@ class Checker
   def clock_in(credential)
     begin
       input_general_data credential
-      #click_clock_in
-      log_in
-      log_out
+      click_clock_in
+      #log_in
       return true
     rescue => ex
       puts "!!! Problem with webdrive !!! Cannot proceed!"
       puts ex
+      reset_driver
       return false
     end
   end
@@ -85,13 +101,14 @@ class Checker
   def clock_out(credential)
     begin
       input_general_data credential
-      #click_clock_out
-      log_in
-      log_out
+      click_clock_out
+      #log_in
       return true
     rescue => ex
       puts "!!! Problem with webdrive !!! Cannot proceed!"
+      puts "!!! Please try again !!!"
       puts ex
+      reset_driver
       return false
     end
   end
@@ -146,6 +163,11 @@ class Checker
       driver = Selenium::WebDriver.for :firefox, options: options
       driver.manage.timeouts.implicit_wait = 5
       driver
+    end
+
+    def reset_driver
+      @driver.quit  
+      @driver = initate_driver
     end
 end
 
