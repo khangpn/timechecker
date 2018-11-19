@@ -26,7 +26,9 @@ class Checker
       puts "Saving your time record..."
       if clock_in(credential)
         @db.insertLog(cardId)
+        puts ""
         puts "Hello '#{credential['username']}'! "
+        puts "Clocking successfully! Please wait the system to exit..."
         # Log out of pronet
         begin
           log_out
