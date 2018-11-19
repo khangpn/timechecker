@@ -21,8 +21,8 @@ class Database
       )
     "
 
-    #@db.execute "CREATE UNIQUE INDEX created_at_index ON logs(created_at);"
-    #@db.execute "CREATE UNIQUE INDEX card_id_index ON credentials(card_id);"
+    @db.execute "CREATE UNIQUE INDEX IF NOT EXISTS created_at_index ON logs(created_at);"
+    @db.execute "CREATE UNIQUE INDEX IF NOT EXISTS card_id_index ON credentials(card_id);"
   end
 
   def insert(cardId, userName, password)
