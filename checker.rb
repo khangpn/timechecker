@@ -228,5 +228,4 @@ while (true) do
   cardId = STDIN.noecho(&:gets).strip
   checker.checkTime(cardId)
   puts "##### Exiting #####"
-  sleep 3
 end
