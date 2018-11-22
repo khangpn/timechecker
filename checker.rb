@@ -23,7 +23,7 @@ class Checker
     unless (credential.nil?)
       # In fact, pronet handle clock in and out similarly, they count the number or records to
       #distingush in/out action
-      puts "- Saving your time record..."
+      puts "- Saving your time record, please wait..."
       if clock_in(credential)
         @db.insertLog(cardId)
         puts ""
@@ -101,7 +101,7 @@ class Checker
       #log_in(credential)
     rescue => ex
       puts "!!! Problem with connection !!! Failed to clock!"
-      puts "!!! Please try again !!!"
+      puts "Closing..."
       puts ex
       reset_driver
       return false
@@ -124,7 +124,7 @@ class Checker
       #log_in(credential)
     rescue => ex
       puts "!!! Problem with connection !!! Failed to clock!"
-      puts "!!! Please try again !!!"
+      puts "Closing..."
       puts ex
       reset_driver
       return false
@@ -228,4 +228,5 @@ while (true) do
   cardId = STDIN.noecho(&:gets).strip
   checker.checkTime(cardId)
   puts "##### Exiting #####"
+  sleep 2
 end
